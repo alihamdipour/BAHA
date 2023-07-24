@@ -1,5 +1,4 @@
 import numpy as np
-#from torch import np.random.permutation
 import matplotlib.pyplot as plt
 from pylab import *
 import pandas as pd
@@ -44,15 +43,12 @@ def WOA_CM(dimension, MaxIter, pop_size, trainX, testX, trainy, testy, pop_pos_i
     
     if maxx<minn:
         maxx = minn + 1
-        #not(c[i].all())
-    
-
-
+ 
     his_best_fit.append(gbest_fit)
 
     
     for n in range(MaxIter-1):
-        print('W Itration : '+str(n)+'-'+str(round)+ '  Fitness: '+str(gbest_fit)+'  Acc: '+str(best_acc)+
+        print('WOA CM, itration : '+str(round)+'-'+str(n)+ '  Fitness: '+str(gbest_fit)+'  Acc: '+str(best_acc)+
                       '  NumF: '+str(len(best_cols))+'  Features: '+str(best_cols))
         a = 2 - 2 * n / (MaxIter - 1)            # linearly decreased from 2 to 0
 
@@ -65,15 +61,12 @@ def WOA_CM(dimension, MaxIter, pop_size, trainX, testX, trainy, testy, pop_pos_i
             b = 1
             if (p < 0.5) :
                 if np.abs(A) < 1:
-                    #D = np.abs(C * gbest - pop[j] )
-                    #pop[j] = gbest - A * D
+
                     muted=WOA_mutation(gbest,n,MaxIter)
                     pop[j]=crossover(pop[j],muted)
                 else :
                     x_rand = pop[np.random.randint(pop_size)] 
-                    #D = np.abs(C * x_rand - pop[j])
-                    #pop[j] = (x_rand - A * D)
-                    
+
                     pop[j] =crossover(pop[j],x_rand)
             else:
                 D1 = np.abs(gbest - pop[j])
