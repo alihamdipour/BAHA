@@ -40,7 +40,7 @@ def AHA(dim,max_it, npop,trainX, testX, trainy, testy, pop_pos_init, pop_fit_ini
     visit_table[diag_ind] = float('nan')
     for it in range(max_it-1):
 
-        print('Itration : '+str(it)+ '  Fitness: '+str(best_f)+'  Acc: '+str(corspod_best_acc)+
+        print('AHA, itration : '+str(it)+ '  Fitness: '+str(best_f)+'  Acc: '+str(corspod_best_acc)+
               '  NumF: '+str(len(corspod_best_cols))+'  Features: '+str(corspod_best_cols))
         # Direction
         visit_table[diag_ind] = float('-inf')
