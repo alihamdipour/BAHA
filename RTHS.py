@@ -63,7 +63,7 @@ def RTHS(dimension,MIT,pop_size,trainX, testX, trainy, testy, pop_pos_init, pop_
 
    
     for i in range(MIT-1):     
-        print('R Itration : '+str(i)+'-'+str(round)+'  Fitness: '+str(bestFit)+'  Acc: '+str(bestAcc)+
+        print('RTHS, itration : '+str(round)+'-'+str(i)+'  Fitness: '+str(bestFit)+'  Acc: '+str(bestAcc)+
             '  NumF: '+str(len(bestCols))+'  Features: '+str(bestCols))   
      
         for j in range(pop_size):
