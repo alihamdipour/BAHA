@@ -112,7 +112,7 @@ def ASGW(dimension, MaxIter, pop_size, trainX, testX, trainy, testy,  pop_pos_in
     #fit_copy = fit.copy()
     flag = 0
     for n in range(MaxIter-1):
-        print('S Itration : '+str(n)+'-'+str(round)+'  Fitness: '+str(corspod_best_fit)+'  Acc: '+str(corspod_best_acc)+
+        print('ASGW Itration : '+str(round)+'-'+str(n)+'  Fitness: '+str(corspod_best_fit)+'  Acc: '+str(corspod_best_acc)+
                '  NumF: '+str(len(corspod_best_cols))+'  Features: '+str(corspod_best_cols))
                
         ind = np.argsort(fit)
