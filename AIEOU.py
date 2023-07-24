@@ -1,5 +1,4 @@
 import numpy as np
-#from torch import np.random.permutation
 import matplotlib.pyplot as plt
 from pylab import *
 import pandas as pd
@@ -27,7 +26,7 @@ def toBinary(currAgent):
         
     return Xnew 
  
-def adaptiveBeta(agent, agentFit, trainX,trainy,testX,testy,corspod_best_acc,corspod_best_cols):
+def adaptiveBeta(agent, agentFit, trainX,trainy,testX,testy,best_acc,best_cols):
 
     
 
@@ -52,10 +51,10 @@ def adaptiveBeta(agent, agentFit, trainX,trainy,testX,testy,corspod_best_acc,cor
         if neighFit <= agentFit:
             agent = neighbor.copy()
             agentFit = neighFit
-            corspod_best_acc = new_acc
-            corspod_best_cols=new_cols
+            best_acc = new_acc
+            best_cols=new_cols
         
-    return (agent,agentFit,corspod_best_acc,corspod_best_cols)
+    return (agent,agentFit,best_acc,best_cols)
 
 def signFunc(x): #signum function? or just sign ?
     if x<0:
@@ -116,8 +115,6 @@ def AIEOU(dimension,maxIter, popSize,trainX, testX, trainy, testy, pop_pos_init,
     poolSize = 4
     Amax=5
     Amin=0.1
-    A2max=5
-    A2min=0.1
     GPmax = 1
     GPmin = 0
     deltaA2=0.5
@@ -127,22 +124,16 @@ def AIEOU(dimension,maxIter, popSize,trainX, testX, trainy, testy, pop_pos_init,
 
     clf=KNeighborsClassifier(n_neighbors=5)
     clf.fit(trainX,trainy)
-    val=clf.score(testX,testy)
-
+ 
     temp_acc = np.zeros(popSize)
     temp_cols = np.empty(popSize, dtype=object)
-
   
-    corspod_best_acc = best_acc_init
-    corspod_best_cols=best_cols_init
+    best_acc = best_acc_init
+    best_cols=best_cols_init
     
     new_acc=float('inf')
     new_cols=[]
 
-    x_axis = []
-    y_axis = []
-
-             
     LAA1 = np.zeros((popSize,3))
     LAA2 = np.zeros((popSize,3))
     LAGP = np.zeros((popSize,3))
@@ -172,26 +163,26 @@ def AIEOU(dimension,maxIter, popSize,trainX, testX, trainy, testy, pop_pos_init,
     for i in range(poolSize+1):
         eqfit[i] = 100
 
-    start_time = datetime.now()
-
-    
-    population=np.copy(pop_pos_init)
-    fitList= np.copy(pop_fit_init)
-    
+    population=pop_pos_init
+    fitList= pop_fit_init    
     his_best_fit.append(best_fit_init)
     best_f=best_fit_init
      
      
     for curriter in range(maxIter-1):
-        print('AItration : '+str(curriter)+'-'+str(round)+'  Fitness: '+str(best_f)+'  Acc: '+str(corspod_best_acc))
+
+        print('AIEOU, itration : '+str(round)+'-'+str(curriter)+'  Fitness: '+str(best_f)+'  Acc: '+str(best_acc)+
+              '  NumF: '+str(len(best_cols))+'  Features: '+str(best_cols))
+        
         popnew = np.zeros((popSize,dimension))
         for i in range(popSize):
             for j in range(poolSize):
                 if fitList[i] <= eqfit[j]:
                     eqfit[j] = deepcopy(fitList[i])
                     eqPool[j] = population[i].copy()
-                    corspod_best_acc = temp_acc[i]
-                    corspod_best_cols=temp_cols[i]
+                    # if j==0:
+                    #     best_acc = temp_acc[i]
+                    #     best_cols=temp_cols[i]
                     break
 
         Cave = avg_concentration(eqPool,poolSize,dimension)
@@ -199,14 +190,14 @@ def AIEOU(dimension,maxIter, popSize,trainX, testX, trainy, testy, pop_pos_init,
         eqfit[poolSize],new_acc,new_cols = Fit_KNN(Cave,trainX,testX,trainy,testy) #newPopFit,new_acc,new_cols    
         
         for p in range(len(eqPool)):
-            eqPool[p], eqfit[p],new_acc,new_cols = adaptiveBeta(eqPool[p], eqfit[p], trainX,trainy,testX,testy,corspod_best_acc,corspod_best_cols)
+            eqPool[p], eqfit[p],new_acc,new_cols = adaptiveBeta(eqPool[p], eqfit[p], trainX,trainy,testX,testy,best_acc,best_cols)
             if p==0:
 
                 his_best_fit.append(eqfit[p])
                 best_x=eqPool[p]
                 best_f=eqfit[p]
-                corspod_best_acc=new_acc
-                corspod_best_cols=new_cols
+                best_acc=new_acc
+                best_cols=new_cols
 
             
         fitListnew=[]
@@ -279,8 +270,10 @@ def AIEOU(dimension,maxIter, popSize,trainX, testX, trainy, testy, pop_pos_init,
                 temp.append(Ceq[j] + (population[i][j] - Ceq[j])*FVec[j] + G[j]*(1 - FVec[j])/lambdaVec[j])
             temp=np.array(temp)
             popnew[i]=toBinary(temp)
-            fitNew,temp_acc[i],temp_cols[i] = Fit_KNN( popnew[i],trainX,testX,trainy,testy)    #newPopFit,new_acc,new_cols
-
+            fitNew,temp_acc,temp_cols = Fit_KNN( popnew[i],trainX,testX,trainy,testy)    #newPopFit,new_acc,new_cols
+            if fitNew <best_f:
+                best_acc=temp_acc
+                best_cols=temp_cols
             fitListnew.append(fitNew)
             beta=1 
             if fitNew<=fitList[i]:
@@ -297,15 +290,4 @@ def AIEOU(dimension,maxIter, popSize,trainX, testX, trainy, testy, pop_pos_init,
             newPopFit,new_acc,new_cols=Fit_KNN(pop,trainX,testX,trainy,testy)
             bestfit.append(newPopFit) #newPopFit,new_acc,new_cols
 
-
-    output = eqPool[0].copy()
-    cols = np.flatnonzero(output)
-    X_test = testX[:,cols]
-    X_train = trainX[:,cols]
-
-    clf=KNeighborsClassifier(n_neighbors=5)
-    
-    clf.fit(X_train,trainy)
-    val=clf.score(X_test, testy )
-   
-    return  best_x, best_f, his_best_fit,corspod_best_acc,corspod_best_cols
+    return  best_x, best_f, his_best_fit,best_acc,best_cols
