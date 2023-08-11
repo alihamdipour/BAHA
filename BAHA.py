@@ -15,6 +15,8 @@ def BAHA(dim,max_it, npop,trainX, testX, trainy, testy , pop_pos_init, pop_fit_i
     lb = 0
     ub = 1
     pop_pos=np.zeros((npop, dim),dtype=int)
+    
+    # convert init positions to binary
     for i in range(npop):
         for j in range(dim):
             if pop_pos_init[i][j]>0.5:
